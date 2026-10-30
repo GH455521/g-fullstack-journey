@@ -1,0 +1,10 @@
+{
+  "words": [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "venv",
+    "pytest",
+    "pycache"
+  ]
+}
