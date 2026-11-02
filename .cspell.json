@@ -5,6 +5,8 @@
     "pydantic",
     "venv",
     "pytest",
-    "pycache"
+    "pycache",
+    "ollama",
+    "qwen",
   ]
 }
