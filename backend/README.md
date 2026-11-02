@@ -10,15 +10,8 @@ uv pip install -r requirements.txt // 从 requirements.txt 安装
 ## 启动后端服务并测试：
 ### 确保当前终端位于 backend 目录，执行：
 ```
-python -吗uvicorn main:app --reload
+uvicorn main:app --reload
 ```
-解释这条命令：
-参数	作用
-python -m	使用当前 Python 环境运行模块
-uvicorn	启动 Web 服务
-main	对应 main.py 文件
-app	对应 main.py 中的 app 对象
---reload	修改代码后自动重新加载服务
 ### 正常情况下，终端会提示服务运行在 http://127.0.0.1:8000。
 ### 在 /docs 页面中：
 ### 1. 找到 GET /health。

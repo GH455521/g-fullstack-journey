@@ -1,14 +1,16 @@
 import os
+import uuid
 
 import requests
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from services.memory import memory
 
 # 创建一个Web应用
 # =========================
 # 1. 创建 FastAPI 应用
 # =========================
-app = FastAPI(title="My AI Assistant", description="我的本地AI助手", version="0.2.0")
+app = FastAPI(title="My AI Assistant", description="我的本地AI助手", version="0.3.0")
 
 # =========================
 # 2. Ollama 配置
@@ -23,7 +25,8 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:14b")
 # 3. 定义请求数据结构
 # =========================
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1)
+    conversation_id: str | None = None
 
 
 # 定义一个最简单的健康检查接口
@@ -32,20 +35,33 @@ class ChatRequest(BaseModel):
 # =========================
 @app.get("/health")
 def health_check():
-    return {"status": "OK", "message": "My AI Assistant backend is running"}
+    return {"status": "OK", "message": "My AI Assistant backend is running", "model": OLLAMA_MODEL}
 
 
 # 定义聊天接口
 # =========================
-# 5. AI 对话接口
+# 5. 多轮 AI 对话接口
 # =========================
 @app.post("/chat")
 def chat(request: ChatRequest):
+    # 如果用户没有提供会话 ID，就自动生成
+    conversation_id = (
+        request.conversation_id or str(uuid.uuid4())
+    )
+    # 读取当前会话历史
+    history = memory.get_history(conversation_id)
+    # 把本轮用户消息添加到上下文
+    message = history + [
+        {
+            "role": "user",
+            "content": request.message
+        }
+    ]
     # 调用 Ollama 本地API
     ollama_api_url = f"{OLLAMA_BASE_URL}/api/chat"
     payload = {
         "model": OLLAMA_MODEL,
-        "messages": [{"role": "user", "content": request.message}],
+        "messages": message,
         "stream": False,
     }
 
@@ -60,8 +76,15 @@ def chat(request: ChatRequest):
 
         if not ai_reply:
             raise HTTPException(status_code=502, detail="Ollama 返回了空回答")
+        # 只有模型成功回答后，才保存本轮消息
+        memory.add_message(
+            conversation_id, "user", request.message
+        )
+        memory.add_message(
+            conversation_id, "assistant", ai_reply
+        )
 
-        return {"reply": ai_reply, "model": OLLAMA_MODEL}
+        return {"conversation_id": conversation_id,"reply": ai_reply, "model": OLLAMA_MODEL}
 
     except requests.exceptions.ConnectionError:
         raise HTTPException(
@@ -74,3 +97,24 @@ def chat(request: ChatRequest):
         raise HTTPException(
             status_code=502, detail=f"Ollama请求失败：{response.text[:500]}"
         )
+# =========================
+# 6. 查看会话历史
+# =========================
+@app.get("/conversations/{conversation_id}")
+def get_conversations(conversations_id: str):
+    history = memory.get_history(conversations_id)
+    return {
+        "conversations_id": conversations_id,
+        "messages": history,
+        "total": len(history)
+    }
+# =========================
+# 7. 清空会话历史
+# =========================
+@app.delete("/conversations/{conversation_id}")
+def delete_conversation(conversation_id: str):
+    memory.clear_history(conversation_id)
+    return {
+        "message": "会话历史已清空",
+        "conversation_id": conversation_id
+    }
