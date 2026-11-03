@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 class ConversationMemory:
   """
   简单的会话记忆管理器。
@@ -10,17 +8,17 @@ class ConversationMemory:
   - 服务重启后数据会丢失
   """
 
-  def __init__(self):
-    self.conversations: Dict[str, List[dict]] = {}
+  def __init__(self) -> None:
+    self.conversations: dict[str, list[dict]] = {}
 
-  def get_history(self, conversation_id: str) -> List[dict]:
+  def get_history(self, conversation_id: str) -> list[dict]:
     """
       获取某个会话的历史消息。
       如果会话不存在，则返回空列表。
       """
     return self.conversations.get(conversation_id, []).copy()
 
-  def add_message(self, conversation_id: str, role: str, content: str):
+  def add_message(self, conversation_id: str, role: str, content: str) -> None:
     """
     向指定会话添加一条消息。
     """
@@ -31,13 +29,13 @@ class ConversationMemory:
       "content": content
     })
 
-  def clear_history(self, conversation_id: str):
+  def clear_history(self, conversation_id: str) -> None:
     """
     清空指定会话。
     """
     self.conversations.pop(conversation_id, None)
 
-  def get_all_conversations(self):
+  def get_all_conversations(self) -> list[str]:
     """
     获取当前所有会话 ID。
     """
