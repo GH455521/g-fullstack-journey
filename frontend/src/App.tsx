@@ -1,10 +1,9 @@
+import Sidebar from './components/Sidebar.js'
+
 function App() {
   return (
     <div className="app">
-      <aside className="sidebar">
-        <h2>My AI Assistant</h2>
-        <p>会话列表区域</p>
-      </aside>
+      <Sidebar />
 
       <main className="chat-panel">
         <header className="chat-header">

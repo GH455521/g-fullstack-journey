@@ -50,3 +50,12 @@ services	请求 FastAPI	管理 React 状态
 utils	通用工具函数	业务页面
 styles	页面样式	业务逻辑
 App.jsx	组合组件	实现全部功能
+
+代码	作用
+function Sidebar()	定义一个 React 函数组件
+return (...)	返回组件要显示的 JSX
+<aside>	表示页面中的侧边栏区域
+className	指定 CSS 类名
+export default Sidebar	允许其他文件导入这个组件
+
+注意：React JSX 使用 className，而不是 HTML 中的 class。
