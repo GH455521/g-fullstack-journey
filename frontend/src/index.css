@@ -11,8 +11,8 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -68,8 +68,7 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 h1,
@@ -116,7 +115,8 @@ code {
   background: var(--code-bg);
 }
 
-button, input {
+button,
+input {
   font: inherit;
 }
 
@@ -316,7 +316,9 @@ button, input {
   border-radius: 12px;
   background: white;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .suggestion-card:hover {
@@ -416,4 +418,14 @@ button, input {
 .message-row.user .message-text {
   background: #2563eb;
   color: white;
+}
+/* 补充 MessageList.tsx 消息列表组件样式 */
+/* 消息列表容器 */
+.message-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 20px 0;
 }

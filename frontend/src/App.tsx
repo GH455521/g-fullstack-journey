@@ -1,10 +1,15 @@
 import ChatHeader from "./components/ChatHeader.js";
-import MessageItem from "./components/MessageItem.js";
+import MessageList from "./components/MessageList.js";
 import Sidebar from "./components/Sidebar.js";
 import Welcome from "./components/Welcome.js";
 
+interface Message {
+  id: string;
+  role: string;
+  content: string;
+}
 // 临时模拟聊天数据
-const messages = [
+const messages: Message[] = [
   {
     id: "1",
     role: "user",
@@ -26,15 +31,11 @@ function App() {
       <main className="chat-panel">
         <ChatHeader title="欢迎开始新对话" model="qwen2.5-coder:14b" />
         <section className="messages-area">
-          <Welcome />
-
-          {messages.map((message) => (
-            <MessageItem
-              key={message.id}
-              role={message.role}
-              content={message.content}
-            />
-          ))}
+          {messages.length === 0 ? (
+            <Welcome />
+          ) : (
+            <MessageList messages={messages} />
+          )}
         </section>
         <footer className="input-area">
           <input type="text" placeholder="请输入信息..." />
