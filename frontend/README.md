@@ -59,3 +59,49 @@ className	指定 CSS 类名
 export default Sidebar	允许其他文件导入这个组件
 
 注意：React JSX 使用 className，而不是 HTML 中的 class。
+
+理解 ChatInput 的职责
+ChatInput
+├── 输入框
+├── 发送按钮
+├── 管理输入内容
+├── 处理 Enter
+└── 将消息交给父组件
+
+
+这里有一个重要的 React 设计思想：
+
+ChatInput 负责收集用户输入，App 负责决定收到输入后做什么。
+
+也就是说，输入组件不应该直接请求 Ollama，而应该通过 Props 把消息交给父组件。
+
+当前组件结构
+到这里，阶段 B 的 UI 组件拆分就全部完成了。
+frontend/src/
+├── App.jsx
+│
+├── components/
+│   ├── Sidebar.jsx
+│   ├── ConversationItem.jsx
+│   ├── ChatHeader.jsx
+│   ├── Welcome.jsx
+│   ├── MessageItem.jsx
+│   ├── MessageList.jsx
+│   └── ChatInput.jsx
+│
+├── hooks/
+├── services/
+├── utils/
+└── styles/
+
+
+我们已经学习了：
+知识点	对应组件
+React 组件与组件组合	Sidebar、App
+Props 数据传递	ConversationItem、ChatHeader
+map 列表渲染	MessageList
+条件渲染	App、Welcome
+消息展示	MessageItem
+useState 状态管理	ChatInput
+父子组件通信	ChatInput、App
+键盘事件处理	ChatInput

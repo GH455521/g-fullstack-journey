@@ -429,3 +429,65 @@ input {
   margin: 0 auto;
   padding: 20px 0;
 }
+/* 补充 ChatInput.tsx 聊天输入框组件样式 */
+/* 聊天输入框容器 */
+.chat-input-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+/* 多行输入框 */
+.chat-input-container textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  max-height: 180px;
+  padding: 10px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  color: #334155;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chat-input-container textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* 发送按钮 */
+.chat-input-container button {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input-container button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+/* 禁用状态 */
+.chat-input-container button:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.chat-input-container textarea:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}

@@ -1,4 +1,5 @@
 import ChatHeader from "./components/ChatHeader.js";
+import ChatInput from "./components/ChatInput.js";
 import MessageList from "./components/MessageList.js";
 import Sidebar from "./components/Sidebar.js";
 import Welcome from "./components/Welcome.js";
@@ -8,7 +9,9 @@ interface Message {
   role: string;
   content: string;
 }
-// 临时模拟聊天数据
+
+function App() {
+  // 临时模拟聊天数据
 const messages: Message[] = [
   {
     id: "1",
@@ -22,8 +25,10 @@ const messages: Message[] = [
       "你好！AI Agent（人工智能智能体）是一种能够感知环境、理解目标、制定计划并调用工具完成任务的 AI 系统。",
   },
 ];
-
-function App() {
+// 接收 ChatInput 传递的消息
+function handleSend(content: string) {
+  console.log('收到用户消息:', content);
+}
   return (
     <div className="app">
       <Sidebar />
@@ -37,10 +42,7 @@ function App() {
             <MessageList messages={messages} />
           )}
         </section>
-        <footer className="input-area">
-          <input type="text" placeholder="请输入信息..." />
-          <button>发送</button>
-        </footer>
+        <ChatInput onSend={handleSend} />
       </main>
     </div>
   );
