@@ -1,75 +1,52 @@
-# React + TypeScript + Vite
+一、先确定最终项目结构
+我们把之前的 frontend/src 改造成下面的结构：
+frontend/
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ src/
 
-Currently, two official plugins are available:
+ main.jsx - React 入口
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+ App.jsx - 页面组合
 
-## React Compiler
+ components/
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Sidebar.jsx — 左侧会话栏
+- ConversationItem.jsx — 单个会话
+- ChatHeader.jsx — 聊天顶部栏
+- MessageList.jsx — 消息列表
+- MessageItem.jsx — 单条消息
+- Welcome.jsx — 欢迎页面
+- ChatInput.jsx — 输入框
 
-## Expanding the ESLint configuration
+ hooks/
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- useConversations.js — 会话管理
+- useChat.js — 聊天和流式输出
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+ services/
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- api.js — 后端普通接口
+- chatStream.js — SSE 流式请求
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+ utils/
 
-```
+- id.js — ID 生成
+- sseParser.js — SSE 数据解析
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+ styles/
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- variables.css — 全局设计变量
+- layout.css — 页面布局
+- chat.css — 聊天区域样式
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 
-```
+
+
+最终各部分的职责：
+模块	负责什么	不负责什么
+components	页面展示和用户交互	直接请求 Ollama
+hooks	React 状态和业务逻辑	页面具体样式
+services	请求 FastAPI	管理 React 状态
+utils	通用工具函数	业务页面
+styles	页面样式	业务逻辑
+App.jsx	组合组件	实现全部功能
