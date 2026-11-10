@@ -346,3 +346,74 @@ button, input {
     font-size: 23px;
   }
 }
+/* 补充 MessageItem.tsx 可重复使用的消息组件样式 */
+/* 单条消息的整体布局 */
+.message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* 用户消息放在右侧 */
+.message-row.user {
+  flex-direction: row-reverse;
+}
+
+/* AI 消息放在左侧 */
+.message-row.assistant {
+  flex-direction: row;
+}
+
+/* 消息头像 */
+.message-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 用户头像 */
+.message-row.user .message-avatar {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* 消息内容区域 */
+.message-content {
+  max-width: 75%;
+  min-width: 0;
+}
+
+/* 角色名称 */
+.message-role {
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* 消息气泡 */
+.message-text {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 用户消息气泡 */
+.message-row.user .message-text {
+  background: #2563eb;
+  color: white;
+}
