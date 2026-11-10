@@ -1,4 +1,4 @@
-import Sidebar from './components/Sidebar.js'
+import Sidebar from "./components/Sidebar.js";
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         </footer>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

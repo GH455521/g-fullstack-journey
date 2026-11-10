@@ -163,7 +163,7 @@ button, input {
   cursor: pointer;
 }
 
-/* 补充Sideabar样式 */
+/* 补充 Sideabar.tsx 左侧侧边栏组件样式 */
 .sidebar-header {
   margin-bottom: 28px;
 }
@@ -202,4 +202,46 @@ button, input {
 .sidebar-placeholder {
   color: #94a3b8;
   font-size: 13px;
+}
+/* 补充 ConversationItem.tsx 历史会话组件样式 */
+.conversation-section-title {
+  margin: 0 0 10px;
+  padding: 0 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.conversation-item:hover {
+  background: #e2e8f0;
+}
+
+.conversation-item.active {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.conversation-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.conversation-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
