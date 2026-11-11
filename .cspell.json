@@ -8,5 +8,7 @@
     "pycache",
     "ollama",
     "qwen",
+    "ntvs",
+    "njsproj",
   ]
 }
