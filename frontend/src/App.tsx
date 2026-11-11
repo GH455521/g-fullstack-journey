@@ -3,12 +3,7 @@ import ChatInput from "./components/ChatInput.tsx";
 import MessageList from "./components/MessageList.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import Welcome from "./components/Welcome.tsx";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
+import type { Message } from "./types/chat.ts";
 
 function App() {
   // 临时模拟聊天数据
@@ -26,7 +21,8 @@ function App() {
     },
   ];
   // 接收 ChatInput 传递的消息
-  function handleSend(content: string) {
+  // void 代表“只处理逻辑、不产出结果”的函数
+  function handleSend(content: string): void {
     console.log("收到用户消息:", content);
   }
   return (

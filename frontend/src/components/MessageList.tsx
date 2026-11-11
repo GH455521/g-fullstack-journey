@@ -1,13 +1,12 @@
 import MessageItem from "./MessageItem";
-type MessageRole = "user" | "assistant";
+import type { Message } from "../types/chat.ts";
 
-interface Messages {
-  id: string;
-  role: MessageRole;
-  content: string;
+// 保留了 MessageListProps，因为它是 MessageList 组件自己的属性类型，不需要放进全局类型文件。
+interface MessageListProps {
+  messages: Message[];
 }
 
-function MessageList({ messages }: { messages: Messages[] }) {
+function MessageList({ messages }: MessageListProps) {
   return (
     <div className="message-list">
       {messages.map((message) => (

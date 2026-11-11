@@ -1,4 +1,4 @@
-type MessageRole = "user" | "assistant";
+import type { MessageRole } from "../types/chat";
 
 interface MessageItemProps {
   role: MessageRole;
