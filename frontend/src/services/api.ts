@@ -1,3 +1,5 @@
+import type { ChatRequest, ChatResponse, ClearConversationResponse, ConversationResponse, HealthResponse } from "../types/api"
+
 // 获取后端 API 基础地址
 const API_BASE_URL = ''
 
@@ -22,9 +24,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return response.json()
 }
 
-export interface HealthResponse {
-  [key: string]: unknown
-}
 // 检查后端 API 健康状态
 export function getHealth(): Promise<HealthResponse> {
   return request<HealthResponse>('/api/health', {
@@ -34,23 +33,23 @@ export function getHealth(): Promise<HealthResponse> {
 
 // 普通聊天请求
 
-export function sendChat<T = unknown>(data: Record<string, unknown>): Promise<T> {
-  return request<T>('/api/chat', {
+export function sendChat(data: ChatRequest): Promise<ChatResponse> {
+  return request<ChatResponse>('/api/chat', {
     method: 'POST',
     body: JSON.stringify(data)
   })
 }
 
 // 获取历史会话
-export function getConversation<T = unknown>(conversationId: string): Promise<T> {
-  return request<T>(`/api/conversations/${conversationId}`, {
+export function getConversation(conversationId: string): Promise<ConversationResponse> {
+  return request<ConversationResponse>(`/api/conversations/${encodeURIComponent(conversationId)}`, {
     method: 'GET'
   })
 }
 
 // 清空会话
-export function clearConversation<T = unknown>(conversationId: string): Promise<T> {
-  return request<T>(`/api/conversations/${conversationId}`, {
+export function clearConversation(conversationId: string): Promise<ClearConversationResponse> {
+  return request<ClearConversationResponse>(`/api/conversations/${encodeURIComponent(conversationId)}`, {
     method: 'DELETE'
   })
 }
