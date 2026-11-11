@@ -1,5 +1,7 @@
+type MessageRole = "user" | "assistant";
+
 interface MessageItemProps {
-  role: string;
+  role: MessageRole;
   content: string;
 }
 

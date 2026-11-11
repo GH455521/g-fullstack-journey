@@ -1,8 +1,9 @@
 import MessageItem from "./MessageItem";
+type MessageRole = "user" | "assistant";
 
 interface Messages {
   id: string;
-  role: string;
+  role: MessageRole;
   content: string;
 }
 

@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-
+// 其中 ! 是 TypeScript 的非空断言，告诉 TypeScript：我们确定页面中存在 root 元素。
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

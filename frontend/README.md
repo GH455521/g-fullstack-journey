@@ -105,3 +105,11 @@ map 列表渲染	MessageList
 useState 状态管理	ChatInput
 父子组件通信	ChatInput、App
 键盘事件处理	ChatInput
+
+写法	含义
+T	泛型类型变量
+T = unknown	泛型默认类型为 unknown
+data: Type	参数类型
+Promise<T>	异步返回值类型
+Record<string, unknown>	键为字符串、值为未知类型的对象
+export	导出函数或变量

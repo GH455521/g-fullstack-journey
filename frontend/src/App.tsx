@@ -6,7 +6,7 @@ import Welcome from "./components/Welcome.tsx";
 
 interface Message {
   id: string;
-  role: string;
+  role: "user" | "assistant";
   content: string;
 }
 
