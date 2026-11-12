@@ -1,3 +1,4 @@
+import "./App.css";
 import ChatHeader from "./components/ChatHeader.tsx";
 import ChatInput from "./components/ChatInput.tsx";
 import MessageList from "./components/MessageList.tsx";
