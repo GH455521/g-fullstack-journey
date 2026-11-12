@@ -68,6 +68,8 @@ export function useChat(): UseChatReturn {
       try {
         // 4. 发送流式请求
         await sendChatStream(requestData, (event: ChatStreamEvent) => {
+          // switch (event.type) 因为 ChatStreamEvent 是可辨识联合类型，所以 TypeScript 可以根据 event.type 自动推断当前事件的结构。
+          // 例如，在 case 'token' 中，event.content 可以直接使用；在 case 'start' 中，event.conversation_id 可以直接使用。
           switch (event.type) {
             case "start": {
               setConversationId(event.conversation_id);

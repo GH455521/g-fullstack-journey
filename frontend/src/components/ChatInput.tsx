@@ -1,14 +1,16 @@
 import { useState } from "react";
+import type { KeyboardEvent } from "react";
 
 interface ChatInputProps {
-  onSend: (content: string) => void;
+  // 支持同步和异步
+  onSend: (content: string) => void | Promise<void>;
   disabled?: boolean;
 }
 
 function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [input, setInput] = useState("");
 
-  function handleSend() {
+  function handleSend(): void {
     const content = input.trim();
 
     // 内容为空或正在发送时，不执行发送
@@ -18,7 +20,7 @@ function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     // 清空输入框
     setInput("");
   }
-  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>): void {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSend();
@@ -37,7 +39,7 @@ function ChatInput({ onSend, disabled = false }: ChatInputProps) {
         />
       </div>
       <button onClick={handleSend} disabled={!input.trim() || disabled}>
-        发送
+        {disabled ? "正在回复..." : "发送"}
       </button>
     </footer>
   );
