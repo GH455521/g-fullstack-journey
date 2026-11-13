@@ -2,16 +2,24 @@ import { useCallback, useState } from "react";
 import type { Message } from "../types/chat";
 import { createId } from "../utils/id";
 import type { ChatRequest } from "../types/api";
-import { sendChatStream } from "../services/api";
+import { getConversation, sendChatStream } from "../services/api";
 import type { ChatStreamEvent } from "../types/stream";
 
 // 实现聊天业务Hook
+/**
+ * useChat 将支持：
+ * 1. sendMessage()：发送消息，沿用当前会话。
+ * 2. loadConversation()：根据会话 ID 加载历史消息。
+ * 3. newConversation()：清空当前聊天，准备开始新会话。
+ */
 interface UseChatReturn {
   messages: Message[];
   conversationId: string | null;
   isLoading: boolean;
   error: string | null;
   sendMessage: (content: string) => Promise<void>;
+  loadConversation: (conversationId: string) => Promise<void>;
+  newConversation: () => void;
 }
 
 export function useChat(): UseChatReturn {
@@ -112,11 +120,51 @@ export function useChat(): UseChatReturn {
     [conversationId, isLoading],
   );
 
+  // 加载历史会话
+  const loadConversation = useCallback(
+    async (targetConversationId: string): Promise<void> => {
+      // 正在发送或加载时，不允许切换会话
+      if (isLoading) return;
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await getConversation(targetConversationId);
+
+        // 将后端消息转换为前端 Message 类型
+        const loadedMessages: Message[] = response.messages.map((message) => ({
+          id: createId(),
+          role: message.role,
+          content: message.content,
+        }));
+        setMessages(loadedMessages);
+        setConversationId(targetConversationId);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "加载会话失败";
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading],
+  );
+  
+  // 新建会话
+  const newConversation = useCallback((): void => {
+    // 正在发送或加载时，不允许新建会话
+    if (isLoading) return
+    setMessages([])
+    setConversationId(null)
+    setError(null)
+  }, [isLoading])
+
   return {
     messages,
     conversationId,
     isLoading,
     error,
     sendMessage,
+    loadConversation,
+    newConversation,
   };
 }
