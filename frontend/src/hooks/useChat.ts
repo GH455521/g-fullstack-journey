@@ -37,6 +37,7 @@ export function useChat(): UseChatReturn {
   // useCallback: 缓存函数引用
   /**
    * useCallback 用于缓存函数，在依赖项没有变化时复用原来的函数。
+   * useCallback 的作用就是：在依赖项没有发生变化的情况下，一直返回上一次创建的那个函数，保证引用地址不变。
    * 这里依赖：
    * - conversationId：下一次发送消息时，需要携带当前会话 ID。
    * - isLoading：避免正在请求时重复发送。
