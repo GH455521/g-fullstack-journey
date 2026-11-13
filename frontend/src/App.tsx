@@ -11,6 +11,8 @@ import { getAllConversations } from "./services/api.ts";
 
 // 距离底部多少像素时，认为用户仍然处于底部附近
 const BOTTOM_THRESHOLD = 100;
+// localStorage 中保存当前会话 ID 的 key
+const ACTIVE_CONVERSATION_KEY = "my-ai-assistant:active-conversation";
 
 function App() {
   //获取聊天状态和发送消息的方法
@@ -35,6 +37,9 @@ function App() {
   // 是否允许自动滚动到底部
   const [isNearBottom, setIsNearBottom] = useState(true);
 
+  // 防止初始化逻辑重复执行
+  const hasInitializedRef = useRef(false);
+
   // 获取全部会话
   const refreshConversations = useCallback(async (): Promise<void> => {
     try {
@@ -44,10 +49,52 @@ function App() {
       console.error("获取会话列表失败", error);
     }
   }, []);
+
   // 在组件挂载(首次加载)时获取会话列表
   useEffect(() => {
-    void refreshConversations();
-  }, [refreshConversations]);
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
+
+    async function initializeApp(): Promise<void> {
+      try {
+        // 1. 获取后端的全部会话
+        const response = await getAllConversations();
+        setConversations(response.conversations);
+
+        // 2. 获取浏览器保存的上次会话 ID
+        const savedConversationId = localStorage.getItem(
+          ACTIVE_CONVERSATION_KEY,
+        );
+        if (!savedConversationId) return;
+
+        // 3. 确认这个会话仍然存在于后端列表中
+        const conversationExists = response.conversations.some(
+          (conversation) =>
+            conversation.conversation_id === savedConversationId,
+        );
+        if (!conversationExists) {
+          // 会话不存在，清空无效记录
+          localStorage.removeItem(ACTIVE_CONVERSATION_KEY);
+          return;
+        }
+
+        // 4. 自动加载上次打开的会话
+        await loadConversation(savedConversationId);
+        // 恢复会话后，滚动位置从底部开始
+        setIsNearBottom(true);
+      } catch (error) {
+        console.error("初始化应用失败：", error);
+      }
+    }
+    void initializeApp();
+  }, [loadConversation]);
+
+  // 当前会话发生变化时，保存会话 ID
+  useEffect(() => {
+    if (!conversationId) return;
+
+    localStorage.setItem(ACTIVE_CONVERSATION_KEY, conversationId);
+  }, [conversationId]);
 
   // 判断用户距离底部的距离
   function checkIsNearBottom(): boolean {
@@ -78,6 +125,9 @@ function App() {
 
   // 新建会话
   function handleNewConversation(): void {
+    // 轻触浏览器保存的上次会话
+    localStorage.removeItem(ACTIVE_CONVERSATION_KEY);
+    // 清空当前聊天状态
     newConversation();
     setIsNearBottom(true);
   }
