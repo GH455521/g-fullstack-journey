@@ -113,6 +113,15 @@ export function useChat(): UseChatReturn {
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : "聊天请求失败";
+        // 目前 sendMessage() 在发送前就把用户消息和空的助手消息加入了页面。
+        // 如果请求失败，页面可能留下一个空白的助手消息。
+        // 我们先让失败时移除这两条临时消息。
+        setMessages((prev) =>
+          prev.filter(
+            (item) =>
+              item.id !== userMessage.id && item.id !== assistantMessage.id,
+          ),
+        );
         setError(message);
       } finally {
         setIsLoading(false);
@@ -142,6 +151,11 @@ export function useChat(): UseChatReturn {
         setConversationId(targetConversationId);
       } catch (error) {
         const message = error instanceof Error ? error.message : "加载会话失败";
+        // 目前逻辑是请求成功后才替换消息。
+        // 如果加载失败，页面会继续显示之前会话的消息，容易让用户误以为显示的是刚刚点击的会话。
+        // 我们先采用一个简单方案：加载失败时清空消息和会话 ID。
+        setMessages([]);
+        setConversationId(null);
         setError(message);
       } finally {
         setIsLoading(false);
@@ -149,15 +163,15 @@ export function useChat(): UseChatReturn {
     },
     [isLoading],
   );
-  
+
   // 新建会话
   const newConversation = useCallback((): void => {
     // 正在发送或加载时，不允许新建会话
-    if (isLoading) return
-    setMessages([])
-    setConversationId(null)
-    setError(null)
-  }, [isLoading])
+    if (isLoading) return;
+    setMessages([]);
+    setConversationId(null);
+    setError(null);
+  }, [isLoading]);
 
   return {
     messages,

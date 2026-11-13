@@ -240,6 +240,8 @@ export async function sendChatStream(
     dispatchEvent();
   } catch (error) {
     console.error("流式响应处理出错:", error);
+    // 接收到错误并更新页面上的错误提示
+    throw error;
   } finally {
     // 释放读取器锁
     reader.releaseLock();
@@ -248,12 +250,9 @@ export async function sendChatStream(
 
 // 获取所有历史会话
 export function getAllConversations(): Promise<ConversationListResponse> {
-  return request<ConversationListResponse>(
-    `/api/conversations`,
-    {
-      method: "GET",
-    },
-  );
+  return request<ConversationListResponse>(`/api/conversations`, {
+    method: "GET",
+  });
 }
 
 // 获取历史会话
