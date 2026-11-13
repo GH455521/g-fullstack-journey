@@ -169,7 +169,48 @@ def chat_stream(request: ChatRequest):
 
 
 # =========================
-# 8. 查看会话历史
+# 8. 获取所有会话列表
+# =========================
+@app.get("/conversations")
+def get_all_conversations():
+    # 获取所有会话 ID
+    conversation_ids = memory.get_all_conversations()
+    conversations = []
+
+    # reversed() 让最近创建的会话优先展示
+    for conversation_id in reversed(conversation_ids):
+        # 获取当前会话的消息
+        history = memory.get_history(conversation_id)
+
+        # 查找第一条用户消息，作为会话标题
+        # 🧩 核心组件一：next(iterator, default)
+        # next() 是 Python 的内置函数，用于获取迭代器（iterator）的下一个元素。
+        # 它的第二个参数 '新对话' 是一个兜底默认值。如果迭代器里面没有任何数据（即循环没找到符合条件的项），它不会报错（不会抛出 StopIteration），而是直接返回 '新对话'。
+
+        # 🧩 核心组件二：生成器表达式
+        # (message['content'] for message in history if message['role'] == 'user')
+        # 这部分用圆括号 () 包裹，是一个生成器。它不会立刻把所有结果计算出来，而是像一个“流水线”，每次调用 next() 时，它才去算下一个符合条件的值。
+        # for message in history：遍历 history（通常是一个字典列表，比如聊天记录）。
+        # if message['role'] == 'user'：过滤条件，只找角色是 'user'（用户）的消息。
+        # message['content']：提取目标，把找到的这条消息的 content（内容）提取出来。
+        first_user_message = next(
+            (message["content"] for message in history if message["role"] == "user"),
+            "新对话",
+        )
+
+        # 标题最多显示 30 个字符
+        title = first_user_message.strip()
+        if len(title) > 30:
+            title = title[:30] + "..."
+
+        conversations.append(
+            {"conversation_id": conversation_id, "title": title, "total": len(history)}
+        )
+    return {"conversations": conversations, "total": len(conversations)}
+
+
+# =========================
+# 9. 查看单个会话历史
 # =========================
 @app.get("/conversations/{conversation_id}")
 def get_conversations(conversation_id: str):
@@ -182,7 +223,7 @@ def get_conversations(conversation_id: str):
 
 
 # =========================
-# 9. 清空会话历史
+# 10. 清空会话历史
 # =========================
 @app.delete("/conversations/{conversation_id}")
 def delete_conversation(conversation_id: str):
