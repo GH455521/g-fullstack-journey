@@ -2,6 +2,7 @@ import type {
   ChatRequest,
   ChatResponse,
   ClearConversationResponse,
+  ConversationListResponse,
   ConversationResponse,
   HealthResponse,
 } from "../types/api";
@@ -244,6 +245,17 @@ export async function sendChatStream(
     reader.releaseLock();
   }
 }
+
+// 获取所有历史会话
+export function getAllConversations(): Promise<ConversationListResponse> {
+  return request<ConversationListResponse>(
+    `/api/conversations`,
+    {
+      method: "GET",
+    },
+  );
+}
+
 // 获取历史会话
 export function getConversation(
   conversationId: string,
