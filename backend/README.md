@@ -25,3 +25,7 @@ uvicorn main:app --reload
 }
 ```
 ### 6. 点击 Execute，确认后端返回对应的 reply。
+
+DB Browser for SQLite：创建、查看和检查数据库、数据表、记录。
+Python sqlite3：项目运行时读写数据库。
+SQLite 数据库文件：保存会话和消息，后端重启后数据仍然存在。

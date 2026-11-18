@@ -3,3 +3,16 @@
 包含代码和含义
 ![alt text](/images/ID生成函数含义.png)
 每个阶段解决的问题、知识点、理解、每个章节完成清单
+
+疑问：后端保存的消息结构只有：
+{
+  role: "user",
+  content: "你好"
+}
+而前端的 Message 类型还需要 id：
+export interface Message {
+  id: string;
+  role: MessageRole;
+  content: string;
+}
+后台需要id吗？
