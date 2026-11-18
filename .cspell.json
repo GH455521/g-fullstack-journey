@@ -1,14 +1,16 @@
 {
   "words": [
+    "executescript",
     "fastapi",
-    "uvicorn",
-    "pydantic",
-    "venv",
-    "pytest",
-    "pycache",
-    "ollama",
-    "qwen",
-    "ntvs",
     "njsproj",
+    "ntvs",
+    "ollama",
+    "pathlib",
+    "pycache",
+    "pydantic",
+    "pytest",
+    "qwen",
+    "uvicorn",
+    "venv"
   ]
 }

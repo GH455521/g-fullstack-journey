@@ -3,6 +3,7 @@ import os
 import uuid
 
 import requests
+from database.connection import initialize_database
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -12,7 +13,11 @@ from services.memory import memory
 # =========================
 # 1. 创建 FastAPI 应用
 # =========================
-app = FastAPI(title="My AI Assistant", description="我的本地AI助手", version="0.4.0")
+app = FastAPI(title="My AI Assistant", description="我的本地AI助手", version="0.5.0")
+
+@app.on_event("startup")
+def startup_event():
+    initialize_database()
 
 # =========================
 # 2. Ollama 配置
