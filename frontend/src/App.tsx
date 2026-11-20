@@ -7,7 +7,7 @@ import Sidebar from "./components/Sidebar.tsx";
 import Welcome from "./components/Welcome.tsx";
 import { useChat } from "./hooks/useChat.ts";
 import type { ConversationSummary } from "./types/api.ts";
-import { getAllConversations } from "./services/api.ts";
+import { clearConversation, getAllConversations, renameConversation, updateConversationPin } from "./services/api.ts";
 
 // 距离底部多少像素时，认为用户仍然处于底部附近
 const BOTTOM_THRESHOLD = 100;
@@ -49,6 +49,45 @@ function App() {
       console.error("获取会话列表失败", error);
     }
   }, []);
+
+  // 重命名会话
+  async function handleRenameConversation(targetConversationId: string, title: string): Promise<void> {
+    try {
+      await renameConversation(targetConversationId, title);
+      await refreshConversations();
+    } catch (error) {
+      console.error("重命名会话失败", error);
+      throw error;
+    }
+  }
+
+  // 修改置顶状态
+  async function handleTogglePin(targetConversationId: string, isPinned: boolean): Promise<void> {
+    try {
+      await updateConversationPin(targetConversationId, isPinned);
+      await refreshConversations();
+    } catch (error) {
+      console.error("修改置顶状态失败", error);
+      throw error;
+    }
+  }
+
+  // 删除会话
+  async function handleDeleteConversation(targetConversationId: string): Promise<void> {
+    try {
+      await clearConversation(targetConversationId);
+      // 如果删除的是当前正在查看的会话
+      if (targetConversationId === conversationId) {
+        localStorage.removeItem(ACTIVE_CONVERSATION_KEY);
+        newConversation()
+        setIsNearBottom(true)
+      }
+      await refreshConversations()
+    } catch (error) {
+      console.error("删除会话失败", error);
+      throw error;
+    }
+  }
 
   // 在组件挂载(首次加载)时获取会话列表
   useEffect(() => {
@@ -176,6 +215,9 @@ function App() {
         activeConversationId={conversationId}
         onNewConversation={handleNewConversation}
         onSelectConversation={handleSelectConversation}
+        onRenameConversation={handleRenameConversation}
+        onTogglePin={handleTogglePin}
+        onDeleteConversation={handleDeleteConversation}
       />
 
       <main className="chat-panel">

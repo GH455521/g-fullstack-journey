@@ -63,6 +63,7 @@ export interface ConversationSummary {
   conversation_id: string;
   title: string;
   total: number;
+  is_pinned: boolean;
 }
 
 /**

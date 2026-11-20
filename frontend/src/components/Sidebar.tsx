@@ -6,6 +6,15 @@ interface SidebarProps {
   activeConversationId: string | null;
   onNewConversation: () => void;
   onSelectConversation: (conversationId: string) => void;
+  onRenameConversation: (
+    conversationId: string,
+    title: string,
+  ) => void | Promise<void>;
+  onTogglePin: (
+    conversationId: string,
+    isPinned: boolean,
+  ) => void | Promise<void>;
+  onDeleteConversation: (conversationId: string) => void | Promise<void>;
 }
 
 function Sidebar({
@@ -13,6 +22,9 @@ function Sidebar({
   activeConversationId,
   onNewConversation,
   onSelectConversation,
+  onRenameConversation,
+  onTogglePin,
+  onDeleteConversation,
 }: SidebarProps) {
   return (
     <aside className="sidebar">
@@ -37,11 +49,16 @@ function Sidebar({
           conversations.map((conversation) => (
             <ConversationItem
               key={conversation.conversation_id}
+              conversationId={conversation.conversation_id}
               title={conversation.title}
               active={conversation.conversation_id === activeConversationId}
+              isPinned={conversation.is_pinned}
               onClick={() => {
                 onSelectConversation(conversation.conversation_id);
               }}
+              onRename={onRenameConversation}
+              onTogglePin={onTogglePin}
+              onDelete={onDeleteConversation}
             />
           ))
         )}

@@ -11,6 +11,8 @@ from repositories.conversation_repository import (
     add_message,
     create_conversation,
     get_conversation,
+    update_conversation_pin,
+    update_conversation_title,
 )
 from repositories.conversation_repository import (
     delete_conversation as repository_delete_conversation,
@@ -46,6 +48,14 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:14b")
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1)
     conversation_id: str | None = None
+
+
+class RenameConversationRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
+
+
+class PinConversationRequest(BaseModel):
+    is_pinned: bool
 
 
 # =========================
@@ -237,6 +247,7 @@ def get_all_conversations():
                 "conversation_id": item["conversation_id"],
                 "title": item["title"],
                 "total": item["total"],
+                "is_pinned": item["is_pinned"],
             }
             for item in conversations
         ],
@@ -280,3 +291,45 @@ def delete_conversation(conversation_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="会话不存在")
     return {"message": "会话历史已清空", "conversation_id": conversation_id}
+
+
+# =========================
+# 11. 重命名会话
+# =========================
+@app.patch("/conversations/{conversation_id}/title")
+def rename_conversation(conversation_id: str, request: RenameConversationRequest):
+    title = request.title.strip()
+
+    if not title:
+        raise HTTPException(status_code=422, detail="会话标题不能为空")
+
+    if len(title) > 100:
+        raise HTTPException(status_code=422, detail="会话标题不能超过100个字符")
+
+    updated = update_conversation_title(conversation_id, title)
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="会话不存在")
+
+    return {
+        "message": "会话标题已更新",
+        "conversation_id": conversation_id,
+        "title": title,
+    }
+
+# =========================
+# 12. 更新会话置顶状态
+# =========================
+@app.patch("/conversations/{conversation_id}/pin")
+def pin_conversation(
+  conversation_id: str, request: PinConversationRequest      
+):
+    updated = update_conversation_pin(conversation_id, request.is_pinned)
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return {
+        "message": ('会话已置顶' if request.is_pinned else '已取消置顶'),
+        "conversation_id": conversation_id,
+        "is_pinned": request.is_pinned
+    }

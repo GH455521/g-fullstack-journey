@@ -278,3 +278,31 @@ export function clearConversation(
     },
   );
 }
+
+// 重命名会话
+export function renameConversation(
+  conversationId: string,
+  title: string,
+): Promise<{ message: string; conversation_id: string; title: string }> {
+  return request(
+    `/api/conversations/${encodeURIComponent(conversationId)}/title`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ title }),
+    },
+  );
+}
+
+// 更新会话置顶状态
+export function updateConversationPin(
+  conversationId: string,
+  isPinned: boolean,
+): Promise<{ message: string; conversation_id: string; is_pinned: boolean }> {
+  return request(
+    `/api/conversations/${encodeURIComponent(conversationId)}/pin`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ is_pinned: isPinned }),
+    },
+  );
+}

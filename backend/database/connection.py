@@ -46,7 +46,8 @@ def get_connection() -> sqlite3.Connection:
 
 def initialize_database() -> None:
     """
-    读取schema.sql，创建数据库表和索引
+    读取schema.sql，创建数据库表和索引。
+    初始化 SQLite 数据库，并执行数据库结构迁移
     """
 
     # 检查 SQL 文件是否存在
@@ -60,8 +61,30 @@ def initialize_database() -> None:
     connection = get_connection()
 
     try:
-        # 执行 SQL 文件中的全部建表语句
+        # 1. 执行 SQL 文件中的全部建表语句，创建不存在的数据表和普通索引
         connection.executescript(schema_sql)
+
+        # 2. 检查 conversations 表是否已存在 is_pinned 字段
+        # PRAGMA table_info 用于查询表结构。
+        columns = connection.execute(
+            "PRAGMA table_info(conversations)"
+        ).fetchall()
+
+        column_names = [column["name"] for column in columns]
+
+        # 3. 如果是旧数据库，则自动添加字段
+        if "is_pinned" not in column_names:
+            # ALTER TABLE 用于给已有表增加字段。
+            # DEFAULT 0 保证原来的所有会话自动成为未置顶状态。
+            connection.execute(
+                """ALTER TABLE conversations ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0 CHECK (is_pinned IN (0, 1))"""
+            )
+            print("检测到旧数据库，已自动添加 is_pinned 字段")
+
+        # 4. 创建置顶排序索引
+        connection.execute(
+            """CREATE INDEX IF NOT EXISTS idx_conversations_is_pinned ON conversations(is_pinned DESC, updated_at DESC)"""
+        )
 
         # 提交事务
         connection.commit()

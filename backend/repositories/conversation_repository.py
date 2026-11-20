@@ -77,20 +77,23 @@ def get_conversation(conversation_id: str) -> dict[str, Any] | None:
 # =========================
 def get_all_conversations() -> list[dict[str, Any]]:
     """
-    获取全部会话，按照最近更新时间倒序排列
+    获取全部会话:
+    1. 置顶会话优先。
+    2. 同一置顶状态下，最新更新时间优先。
     """
     connection = get_connection()
 
     try:
         # LEFT JOIN 可以保留没有消息的新对话。如果使用普通 JOIN，还没有消息的会话就不会出现在结果中。
         rows = connection.execute(
-            """SELECT c.id,c.title,c.created_at,c.updated_at, COUNT(m.id) AS total FROM conversations AS c LEFT JOIN messages AS m ON c.id=m.conversation_id GROUP BY c.id ORDER BY c.updated_at DESC, c.created_at DESC"""
+            """SELECT c.id,c.title,c.is_pinned,c.created_at,c.updated_at, COUNT(m.id) AS total FROM conversations AS c LEFT JOIN messages AS m ON c.id=m.conversation_id GROUP BY c.id ORDER BY c.is_pinned DESC, c.updated_at DESC, c.created_at DESC"""
         ).fetchall()
 
         return [
             {
                 "conversation_id": row["id"],
                 "title": row["title"],
+                "is_pinned": bool(row["is_pinned"]),
                 "created_at": row["created_at"],
                 "updated_at": row["updated_at"],
                 "total": row["total"],
@@ -181,7 +184,33 @@ def update_conversation_title(conversation_id: str, title: str) -> bool:
 
 
 # =========================
-# 6. 删除会话
+# 6. 更新会话置顶状态
+# =========================
+def update_conversation_pin(conversation_id: str, is_pinned: bool) -> bool:
+    """
+    更新会话置顶状态。
+    成功返回 True，会话不存在返回False
+    """
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """UPDATE conversations SET is_pinned = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?""",
+            (int(is_pinned), conversation_id),
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+
+# =========================
+# 7. 删除会话
 # =========================
 def delete_conversation(conversation_id: str) -> bool:
     """删除指定会话，messages 表中的关联消息会通过外键级联删除"""
