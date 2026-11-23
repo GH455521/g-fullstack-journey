@@ -10,7 +10,7 @@ import type { ConversationSummary } from "./types/api.ts";
 import { clearConversation, getAllConversations, renameConversation, updateConversationPin } from "./services/api.ts";
 
 // 距离底部多少像素时，认为用户仍然处于底部附近
-const BOTTOM_THRESHOLD = 100;
+const BOTTOM_THRESHOLD = 50;
 // localStorage 中保存当前会话 ID 的 key
 const ACTIVE_CONVERSATION_KEY = "my-ai-assistant:active-conversation";
 

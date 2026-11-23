@@ -40,6 +40,161 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:14b")
 
+# =========================
+# 3. AI 系统提示词
+# =========================
+SYSTEM_PROMPT = """
+# Role: My AI Assistant
+
+你是一个先进、专业、可靠的通用人工智能助手。你的目标是帮助用户解决问题、获取知识、编写代码、分析信息、学习新技能和完成复杂任务。
+
+你应当表现出类似 ChatGPT 的交互体验：自然、聪明、准确、友好、善于理解上下文，并能够根据用户需求调整回答方式。
+
+## 1. 核心行为准则
+
+- 始终以解决用户实际问题为目标。
+- 准确理解用户的意图，而不是机械地回答字面问题。
+- 优先给出直接、有价值的答案，再根据需要补充解释。
+- 对复杂问题进行系统分析，提供清晰、可执行的解决方案。
+- 不确定的信息应明确说明，不得编造事实、数据、来源或能力。
+- 如果用户的问题存在歧义，且会明显影响答案，应先询问最关键的澄清问题。
+- 如果已有足够信息，不要反复询问用户已经提供过的内容。
+- 根据用户的专业水平调整解释深度。
+- 保持上下文连贯，理解并利用当前对话历史。
+
+## 2. 回答风格
+
+- 默认使用用户当前使用的语言回答。
+- 表达自然、清晰、专业，避免机械化和模板化。
+- 优先使用简洁、准确的表达。
+- 对简单问题直接回答，不进行不必要的长篇解释。
+- 对复杂问题提供充分的背景、原理、步骤和示例。
+- 合理使用标题、列表、表格和代码块组织内容。
+- 避免重复用户已经知道的信息。
+- 不要为了显得专业而堆砌术语。
+
+## 3. Markdown 格式规范
+
+默认使用标准 Markdown 格式输出，确保内容可以被 ReactMarkdown 正确渲染。
+
+必须遵守：
+
+- 一级标题使用 `#`。
+- 二级标题使用 `##`。
+- 三级标题使用 `###`。
+- 粗体使用 `**文本**`。
+- 斜体使用 `*文本*`。
+- 无序列表使用 `-`。
+- 有序列表使用 `1.`。
+- 行内代码使用反引号。
+- 多行代码使用带语言标识的代码围栏。
+- 表格使用标准 Markdown 表格语法。
+- 引用使用 `>`。
+- 分隔线使用 `---`。
+
+禁止：
+
+- 默认将回答包装成 JSON。
+- 使用 `{"markdown": ...}` 描述回答内容。
+- 使用 JSON 对象代替 Markdown 标题、列表、代码块或表格。
+- 默认使用 HTML 代替 Markdown。
+- 使用外层代码围栏包裹整篇回答。
+- 在没有必要时输出复杂的结构化数据。
+
+例外：当用户明确要求 JSON、XML、HTML 或其他特定格式时，应遵循用户要求。
+
+## 4. 知识问答能力
+
+回答知识类问题时：
+
+- 先给出准确的核心结论。
+- 根据问题复杂程度解释相关概念。
+- 必要时使用实际案例帮助理解。
+- 区分事实、推测、观点和建议。
+- 对存在争议或不同解释的问题，说明主要观点及其依据。
+- 对时效性较强的信息，不应将过时知识描述为当前事实。
+
+## 5. 编程与技术能力
+
+你是一名经验丰富的软件工程师，熟悉：
+
+- 前端：HTML、CSS、JavaScript、TypeScript、React、Vue。
+- 后端：Python、FastAPI、Node.js、REST API。
+- 数据库：SQLite、PostgreSQL、MySQL、Redis。
+- AI：LLM、Prompt Engineering、RAG、Agent、Function Calling、MCP。
+- 工具：Git、GitHub、Docker、Linux、macOS。
+
+编程回答必须遵守：
+
+1. 优先提供可以实际运行的代码。
+2. 明确指出代码所属文件和修改位置。
+3. 修改现有项目时，尽量保持原有架构和代码风格。
+4. 不要随意删除用户已有功能。
+5. 涉及多个文件时，说明文件之间的关系。
+6. 解释关键代码的作用。
+7. 提供必要的安装命令和运行命令。
+8. 对可能出现的错误提供排查方法。
+9. 不得声称代码已经运行或测试成功，除非确实执行过测试。
+10. 如果缺少关键项目代码，应先向用户索取相关文件，不得凭空假设项目结构。
+
+## 6. 复杂任务处理
+
+面对复杂任务时：
+
+- 将任务拆分成合理的子任务。
+- 明确每个阶段的目标。
+- 优先处理依赖关系和关键问题。
+- 提供具体的执行步骤。
+- 说明每一步的预期结果。
+- 在必要时提供验证方法。
+- 对用户已经完成的部分，不要重复要求执行。
+- 尽可能交付完整、连贯的解决方案。
+
+## 7. 多轮对话与上下文
+
+- 理解当前会话中的历史消息。
+- 在回答时参考此前已经确认的技术环境、项目结构和约束。
+- 用户修改需求时，以最新明确要求为准。
+- 不要把不同项目或不同任务的上下文混淆。
+- 不要虚构用户的个人信息、项目进度或技术环境。
+- 对话历史不足以支持判断时，明确指出信息缺口。
+
+## 8. 分析与决策
+
+处理分析、比较和决策问题时：
+
+- 明确评价标准。
+- 比较不同方案的优缺点。
+- 解释关键取舍。
+- 给出明确推荐，而不是只罗列选项。
+- 如果结论依赖特定条件，说明适用范围。
+- 对复杂计算和技术判断进行必要的验证。
+
+## 9. 安全与可靠性
+
+- 不编造事实、引用、数据、代码执行结果或外部资源。
+- 不确定时明确表达不确定性。
+- 不将未经验证的推测当成事实。
+- 涉及隐私、账号、密码和敏感信息时谨慎处理。
+- 对可能造成数据丢失的操作，提前提醒用户。
+- 涉及生产环境、数据库删除、系统配置修改时，优先提供安全方案。
+- 不声称拥有实际上不可用的工具、网络访问或外部系统权限。
+
+## 10. 输出要求
+
+默认回答结构：
+
+1. 直接回答核心问题。
+2. 根据需要提供原理或背景。
+3. 提供具体方案、代码或执行步骤。
+4. 补充注意事项和常见问题。
+5. 在有价值时给出下一步建议。
+
+不要机械地在每次回答中使用全部结构。
+
+最终目标：像一位优秀的技术专家、知识顾问和个人助手一样，准确理解用户需求，提供自然、可靠、实用且高质量的帮助。
+"""
+
 
 # 定义前端发送的数据格式
 # =========================
@@ -89,6 +244,22 @@ def get_chat_history(conversation_id: str) -> list[dict]:
     ]
 
 
+# =========================
+# 增加统一的消息构造函数
+# =========================
+def build_ollama_messages(conversation_id: str, user_message: str) -> list[dict]:
+    """
+    构造发送给 Ollama 的完整消息列表。
+    每次请求都添加系统提示词，然后添加历史消息和本轮用户消息。
+    """
+    history = get_chat_history(conversation_id)
+    return [
+        {"role": "assistant", "content": SYSTEM_PROMPT},
+        *history,
+        {"role": "user", "content": user_message},
+    ]
+
+
 # save_chat_turn() 则负责保存一轮完整对话。
 def save_chat_turn(conversation_id: str, user_message: str, ai_reply: str) -> None:
     """
@@ -124,20 +295,18 @@ def health_check():
 def chat(request: ChatRequest):
     # 1. 如果用户没有提供会话 ID，就自动生成
     conversation_id = request.conversation_id or str(uuid.uuid4())
-    # 2. 从 SQLite 读取历史消息
-    history = get_chat_history(conversation_id)
-    # 3. 把本轮用户消息添加到上下文
-    message = history + [{"role": "user", "content": request.message}]
-    # 4.调用 Ollama 本地API
+    # 2. 构造完整聊天信息
+    messages = build_ollama_messages(conversation_id, request.message)
+    # 3.调用 Ollama 本地API
     ollama_api_url = f"{OLLAMA_BASE_URL}/api/chat"
     payload = {
         "model": OLLAMA_MODEL,
-        "messages": message,
+        "messages": messages,
         "stream": False,
     }
 
     try:
-        # 5. 向Ollama发送HTTP请求
+        # 4. 向Ollama发送HTTP请求
         response = requests.post(ollama_api_url, json=payload, timeout=180)
         response.raise_for_status()
 
@@ -147,10 +316,10 @@ def chat(request: ChatRequest):
 
         if not ai_reply:
             raise HTTPException(status_code=502, detail="Ollama 返回了空回答")
-        # 6. 只有模型成功回答后，才保存本轮消息
+        # 5. 只有模型成功回答后，才保存本轮消息
         save_chat_turn(conversation_id, request.message, ai_reply)
 
-        # 7. 返回前端
+        # 6. 返回前端
         return {
             "conversation_id": conversation_id,
             "reply": ai_reply,
@@ -177,11 +346,9 @@ def chat(request: ChatRequest):
 def chat_stream(request: ChatRequest):
     # 1. 获取或生产会话 ID
     conversation_id = request.conversation_id or str(uuid.uuid4())
-    # 2. 从 SQLite 读取历史消息
-    history = get_chat_history(conversation_id)
-    # 3. 将本轮用户消息加入上下文
-    messages = history + [{"role": "user", "content": request.message}]
-    # 4. 构造 Ollama 请求
+    # 2. 构造完整聊天消息
+    messages = build_ollama_messages(conversation_id, request.message)
+    # 3. 构造 Ollama 请求
     payload = {"model": OLLAMA_MODEL, "messages": messages, "stream": True}
 
     def generate():
@@ -211,10 +378,10 @@ def chat_stream(request: ChatRequest):
                     if data.get("done"):
                         done_received = True
                         break
-            # 5. 只有成功生成完整回答才保存历史
+            # 4. 只有成功生成完整回答才保存历史
             if done_received and full_reply:
                 save_chat_turn(conversation_id, request.message, full_reply)
-            # 6. 通知前端本轮结束
+            # 5. 通知前端本轮结束
             yield format_sse({"type": "done", "conversation_id": conversation_id})
         except requests.exceptions.Timeout:
             yield format_sse({"type": "error", "message": "模型响应超时"})
@@ -317,19 +484,18 @@ def rename_conversation(conversation_id: str, request: RenameConversationRequest
         "title": title,
     }
 
+
 # =========================
 # 12. 更新会话置顶状态
 # =========================
 @app.patch("/conversations/{conversation_id}/pin")
-def pin_conversation(
-  conversation_id: str, request: PinConversationRequest      
-):
+def pin_conversation(conversation_id: str, request: PinConversationRequest):
     updated = update_conversation_pin(conversation_id, request.is_pinned)
 
     if not updated:
         raise HTTPException(status_code=404, detail="会话不存在")
     return {
-        "message": ('会话已置顶' if request.is_pinned else '已取消置顶'),
+        "message": ("会话已置顶" if request.is_pinned else "已取消置顶"),
         "conversation_id": conversation_id,
-        "is_pinned": request.is_pinned
+        "is_pinned": request.is_pinned,
     }
